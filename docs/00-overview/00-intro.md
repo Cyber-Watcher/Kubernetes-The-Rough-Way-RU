@@ -71,7 +71,7 @@
 | нет ingress, DNS, storage | полный production stack |
 | нет документации | полноценное руководство |
 
-Мы не просто повторяем KTHW — мы создаём **реальный production‑кластер**, как это делает Senior DevOps.
+Мы не повторяем KTHW — мы создаём **реальный production‑кластер**, как это делает Senior DevOps.
 
 ---
 
