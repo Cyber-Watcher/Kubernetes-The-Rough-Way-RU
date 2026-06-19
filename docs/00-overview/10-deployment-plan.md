@@ -6,6 +6,7 @@
   - [**10.1.1. Создание виртуальных машин**](#1011-создание-виртуальных-машин)
   - [**10.1.2. Сетевая схема**](#1012-сетевая-схема)
   - [**10.1.3. Установка ОС (на всех нодах)**](#1013-установка-ос-на-всех-нодах)
+    - [**Подготовка ядра для kube-proxy (IPVS)**](#подготовка-ядра-для-kube-proxy-ipvs)
   - [**10.1.4. LVM‑разметка (на этапе установки ОС)**](#1014-lvmразметка-на-этапе-установки-ос)
     - [Control Plane:](#control-plane)
     - [Worker Nodes:](#worker-nodes)
@@ -23,9 +24,11 @@
   - [**10.3.2. Развёртывание etcd‑кластера**](#1032-развёртывание-etcdкластера)
   - [**10.3.3. Развёртывание HAProxy + VRRP**](#1033-развёртывание-haproxy--vrrp)
   - [**10.3.4. Развёртывание kube-apiserver**](#1034-развёртывание-kube-apiserver)
+    - [**Обязательные параметры ServiceAccount для kube-apiserver**](#обязательные-параметры-serviceaccount-для-kube-apiserver)
   - [**10.3.5. Развёртывание controller-manager и scheduler**](#1035-развёртывание-controller-manager-и-scheduler)
 - [**10.4. Развёртывание Worker Nodes**](#104-развёртывание-worker-nodes)
   - [**10.4.1. Установка бинарников**](#1041-установка-бинарников)
+    - [**Ограничение размера логов containerd**](#ограничение-размера-логов-containerd)
   - [**10.4.2. Конфигурация kubelet**](#1042-конфигурация-kubelet)
     - [**Примечание о механике TLS Bootstrap**](#примечание-о-механике-tls-bootstrap)
       - [**Вариант A — Полностью ручной выпуск сертификатов (наш вариант)**](#вариант-a--полностью-ручной-выпуск-сертификатов-наш-вариант)
@@ -107,7 +110,39 @@ worker‑02: 192.168.88.22
 - swap off  
 - sysctl для сети  
 - iptables/nftables  
-- conntrack  
+- conntrack 
+
+### **Подготовка ядра для kube-proxy (IPVS)**
+
+Для работы kube‑proxy в режиме IPVS необходимо заранее загрузить модули ядра.  
+На всех нодах создаём файл:
+
+```
+/etc/modules-load.d/ipvs.conf
+```
+
+С содержимым:
+
+```
+ip_vs
+ip_vs_rr
+ip_vs_wrr
+ip_vs_sh
+nf_conntrack
+```
+
+И применяем sysctl‑параметры:
+
+```
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+```
+
+Без этих настроек:
+
+- kube‑proxy может не перейти в IPVS,  
+- Calico может не обрабатывать трафик,  
+- Pod → Pod и Service → Pod могут не работать. 
 
 ## **10.1.4. LVM‑разметка (на этапе установки ОС)**
 
@@ -257,6 +292,24 @@ Worker Nodes:
 - front-proxy  
 - audit‑логирование  
 - запуск через systemd
+  
+ ### **Обязательные параметры ServiceAccount для kube-apiserver**
+
+Современные версии Kubernetes требуют явного указания эмитента и ключа подписи ServiceAccount токенов.  
+В systemd‑юните `kube-apiserver` должны быть указаны параметры:
+
+```
+--service-account-issuer=https://kubernetes.default.svc.cluster.local
+--service-account-signing-key-file=/etc/kubernetes/pki/sa.key
+--service-account-key-file=/etc/kubernetes/pki/sa.pub
+```
+
+Без этих флагов:
+
+- токены ServiceAccount будут считаться недействительными,  
+- системные Pod’ы (CoreDNS, Calico, kube-proxy) не смогут пройти аутентификацию,  
+- кластер будет частично неработоспособен.
+ 
 
 ## **10.3.5. Развёртывание controller-manager и scheduler**
 
@@ -279,6 +332,35 @@ Worker Nodes:
 /usr/local/bin/kubelet
 /usr/local/bin/kube-proxy
 ```
+
+### **Ограничение размера логов containerd**
+
+Чтобы предотвратить переполнение `/var/log`, необходимо включить ротацию логов контейнеров.  
+В файле:
+
+```
+/etc/containerd/config.toml
+```
+
+в секции:
+
+```
+[plugins."io.containerd.grpc.v1.cri".container]
+```
+
+добавляем:
+
+```toml
+log_max_size = 10485760   # 10 MB
+log_max_files = 5
+```
+
+Это гарантирует:
+
+- ограничение роста логов Pod’ов,  
+- предсказуемое использование LV `/var/log`,  
+- отсутствие DiskPressure,  
+- согласованность с архитектурой хранения (глава 08).
 
 ## **10.4.2. Конфигурация kubelet**
 
