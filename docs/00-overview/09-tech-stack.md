@@ -1,6 +1,35 @@
 
 Оглавление
 
+- [**9. Стек технологий Kubernetes The Rough Way**](#9-стек-технологий-kubernetes-the-rough-way)
+- [**9.1. Kubernetes Core Components**](#91-kubernetes-core-components)
+    - [**Используемые компоненты:**](#используемые-компоненты)
+    - [**Причины выбора:**](#причины-выбора)
+- [**9.2. Container Runtime**](#92-container-runtime)
+    - [**Причины:**](#причины)
+- [**9.3. CNI (Container Network Interface)**](#93-cni-container-network-interface)
+    - [**Причины:**](#причины-1)
+    - [**Инвариант:**](#инвариант)
+- [**9.4. Load Balancing Layer для kube-apiserver**](#94-load-balancing-layer-для-kube-apiserver)
+    - [**VIP:**](#vip)
+    - [**Схема:**](#схема)
+    - [**Причины выбора HAProxy:**](#причины-выбора-haproxy)
+    - [**Причины выбора Keepalived:**](#причины-выбора-keepalived)
+- [**9.5. Ingress Layer**](#95-ingress-layer)
+    - [**Причины:**](#причины-2)
+    - [**Важно:**](#важно)
+- [**9.6. PKI Stack**](#96-pki-stack)
+    - [**Сертификаты используются для:**](#сертификаты-используются-для)
+- [**9.7. Storage \& Filesystem Stack**](#97-storage--filesystem-stack)
+    - [**Используем:**](#используем)
+    - [**Причины:**](#причины-3)
+- [**9.8. OS \& System Stack**](#98-os--system-stack)
+    - [**Причины:**](#причины-4)
+- [**9.9. Observability Stack**](#99-observability-stack)
+- [**9.10. Security Stack**](#910-security-stack)
+- [**9.11. Инструменты разработки и CI/CD**](#911-инструменты-разработки-и-cicd)
+- [**9.12. Итоговая сводка стека**](#912-итоговая-сводка-стека)
+
 
 ---
 
