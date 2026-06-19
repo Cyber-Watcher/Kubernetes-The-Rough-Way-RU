@@ -346,4 +346,4 @@ PKI — это фундамент Kubernetes.
 Следующий файл:
 
 📘 `docs/00-overview/07-networking.md`  
-**7. Сетевая архитектура**
+**7. Сетевая архитектура Kubernetes**
