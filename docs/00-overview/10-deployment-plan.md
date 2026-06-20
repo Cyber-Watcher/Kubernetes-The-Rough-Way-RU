@@ -522,3 +522,8 @@ tolerations:
 - с предсказуемой сетевой и дисковой архитектурой.
 
 ---
+
+Следующий файл:
+
+📘 `docs/00-overview/11-repo-structure.md`  
+**11. Структура репозитория Kubernetes The Rough Way**
