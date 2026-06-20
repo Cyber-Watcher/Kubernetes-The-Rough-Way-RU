@@ -62,7 +62,7 @@ Kubernetes-The-Rough-Way-RU/
 
 ### 11.2.1. `docs/00-overview/`
 
-Это то, что мы уже пишем — архитектурные главы, без команд:
+Архитектурные главы, без команд:
 
 ```text
 docs/00-overview/
@@ -87,10 +87,10 @@ docs/00-overview/
 
 Каждый этап — отдельная папка с одинаковой внутренней структурой:
 
-- `<stage>-steps.md` — пошаговый гайд  
-- `systemd-units.md` — systemd-юниты, относящиеся к этапу  
-- `checklist.md` — чек-лист проверки  
-- `troubleshooting.md` — типовые ошибки и отладка  
+- `<stage>-steps.md` — пошаговый гайд (есть всегда)  
+- `systemd-units.md` — systemd-юниты, относящиеся к этапу  (опционально)
+- `checklist.md` — чек-лист проверки  (опционально)
+- `troubleshooting.md` — типовые ошибки и отладка  (опционально) 
 
 ```text
 docs/01-install-cluster/
